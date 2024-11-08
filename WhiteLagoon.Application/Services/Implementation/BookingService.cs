@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using WhiteLagoon.Application.Common.Interfaces;
+﻿using WhiteLagoon.Application.Common.Interfaces;
 using WhiteLagoon.Application.Common.Utility;
 using WhiteLagoon.Application.Services.Interface;
 using WhiteLagoon.Domain.Entities;
@@ -27,7 +22,7 @@ namespace WhiteLagoon.Application.Services.Implementation
         public IEnumerable<Booking> GetAllBookings(string userId = "", string? statusFilterList = "")
         {
             IEnumerable<string> statusList = statusFilterList.ToLower().Split(",");
-            if(!string.IsNullOrEmpty(statusFilterList) && !string.IsNullOrEmpty(userId))
+            if (!string.IsNullOrEmpty(statusFilterList) && !string.IsNullOrEmpty(userId))
             {
                 return _unitOfWork.Booking.GetAll(u => statusList.Contains(u.Status.ToLower()) &&
                 u.UserId == userId, includeProperties: "User,Villa");
@@ -48,7 +43,7 @@ namespace WhiteLagoon.Application.Services.Implementation
 
         public Booking GetBookingById(int bookingId)
         {
-            return _unitOfWork.Booking.Get(u=>u.Id==bookingId,includeProperties: "User, Villa");
+            return _unitOfWork.Booking.Get(u => u.Id == bookingId, includeProperties: "User, Villa");
         }
 
         public IEnumerable<int> GetCheckedInVillaNumbers(int villaId)
@@ -59,7 +54,7 @@ namespace WhiteLagoon.Application.Services.Implementation
 
         public void UpdateStatus(int bookingId, string bookingStatus, int villaNumber = 0)
         {
-            var bookingFromDb = _unitOfWork.Booking.Get(m => m.Id == bookingId, tracked:true);
+            var bookingFromDb = _unitOfWork.Booking.Get(m => m.Id == bookingId, tracked: true);
             if (bookingFromDb != null)
             {
                 bookingFromDb.Status = bookingStatus;

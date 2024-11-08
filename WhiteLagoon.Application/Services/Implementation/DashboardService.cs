@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using WhiteLagoon.Application.Common.Interfaces;
+﻿using WhiteLagoon.Application.Common.Interfaces;
 using WhiteLagoon.Application.Common.Utility;
 using WhiteLagoon.Application.Services.Interface;
 using WhiteLagoon.Web.ViewModels;
@@ -44,7 +39,8 @@ namespace WhiteLagoon.Application.Services.Implementation
             var bookingData = _unitOfWork.Booking.GetAll(u => u.BookingDate >= DateTime.Now.AddDays(-30) &&
              u.BookingDate.Date <= DateTime.Now)
                  .GroupBy(b => b.BookingDate.Date)
-                 .Select(u => new {
+                 .Select(u => new
+                 {
                      DateTime = u.Key,
                      NewBookingCount = u.Count()
                  });
@@ -52,7 +48,8 @@ namespace WhiteLagoon.Application.Services.Implementation
             var customerData = _unitOfWork.User.GetAll(u => u.CreatedAt >= DateTime.Now.AddDays(-30) &&
             u.CreatedAt.Date <= DateTime.Now)
                 .GroupBy(b => b.CreatedAt.Date)
-                .Select(u => new {
+                .Select(u => new
+                {
                     DateTime = u.Key,
                     NewCustomerCount = u.Count()
                 });
@@ -151,6 +148,6 @@ namespace WhiteLagoon.Application.Services.Implementation
 
 
 
-        
+
     }
 }

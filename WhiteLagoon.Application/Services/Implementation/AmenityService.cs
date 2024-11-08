@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using WhiteLagoon.Application.Common.Interfaces;
+﻿using WhiteLagoon.Application.Common.Interfaces;
 using WhiteLagoon.Application.Services.Interface;
 using WhiteLagoon.Domain.Entities;
 
@@ -12,6 +7,7 @@ namespace WhiteLagoon.Application.Services.Implementation
     public class AmenityService : IAmenityService
     {
         private readonly IUnitOfWork _unitOfWork;
+
         public AmenityService(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;

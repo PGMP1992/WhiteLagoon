@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Stripe;
 using Stripe.Checkout;
 using Syncfusion.DocIO;
 using Syncfusion.DocIO.DLS;
@@ -9,12 +8,10 @@ using Syncfusion.DocIORenderer;
 using Syncfusion.Drawing;
 using Syncfusion.Pdf;
 using System.Security.Claims;
-using WhiteLagoon.Application.Common.Interfaces;
 using WhiteLagoon.Application.Common.Utility;
 using WhiteLagoon.Application.Contract;
 using WhiteLagoon.Application.Services.Interface;
 using WhiteLagoon.Domain.Entities;
-using WhiteLagoon.Infrastructure.Repository;
 
 namespace WhiteLagoon.Web.Controllers
 {
@@ -55,7 +52,7 @@ namespace WhiteLagoon.Web.Controllers
 
             ApplicationUser user = _userManager.FindByIdAsync(userId).GetAwaiter().GetResult();
 
-            Booking booking = new() 
+            Booking booking = new()
             {
                 VillaId = villaId,
                 Villa = _villaService.GetVillaById(villaId),
@@ -63,9 +60,9 @@ namespace WhiteLagoon.Web.Controllers
                 Nights = nights,
                 CheckOutDate = checkInDate.AddDays(nights),
                 UserId = userId,
-                Phone=user.PhoneNumber,
-                Email=user.Email,
-                Name=user.Name
+                Phone = user.PhoneNumber,
+                Email = user.Email,
+                Name = user.Name
             };
             booking.TotalCost = booking.Villa.Price * nights;
             return View(booking);
@@ -78,12 +75,12 @@ namespace WhiteLagoon.Web.Controllers
             var villa = _villaService.GetVillaById(booking.VillaId);
             booking.TotalCost = villa.Price * booking.Nights;
 
-            booking.Status=SD.StatusPending;
+            booking.Status = SD.StatusPending;
             booking.BookingDate = DateTime.Now;
 
-           
 
-            if (!_villaService.IsVillaAvailableByDate(villa.Id,booking.Nights,booking.CheckInDate))
+
+            if (!_villaService.IsVillaAvailableByDate(villa.Id, booking.Nights, booking.CheckInDate))
             {
                 TempData["error"] = "Room has been sold out!";
                 //no rooms available
@@ -100,10 +97,10 @@ namespace WhiteLagoon.Web.Controllers
 
             _bookingService.CreateBooking(booking);
 
-            var domain = Request.Scheme+"://"+Request.Host.Value+"/";
-          
+            var domain = Request.Scheme + "://" + Request.Host.Value + "/";
+
             var options = _paymentService.CreateStripeSessionOptions(booking, villa, domain);
-           
+
             var session = _paymentService.CreateStripeSession(options);
 
             _bookingService.UpdateStripePaymentID(booking.Id, session.Id, session.PaymentIntentId);
@@ -126,10 +123,10 @@ namespace WhiteLagoon.Web.Controllers
 
                 if (session.PaymentStatus == "paid")
                 {
-                    _bookingService.UpdateStatus(bookingFromDb.Id, SD.StatusApproved,0);
-                    _bookingService.UpdateStripePaymentID(bookingFromDb.Id,session.Id,session.PaymentIntentId);
+                    _bookingService.UpdateStatus(bookingFromDb.Id, SD.StatusApproved, 0);
+                    _bookingService.UpdateStripePaymentID(bookingFromDb.Id, session.Id, session.PaymentIntentId);
 
-                    _emailService.SendEmailAsync(bookingFromDb.Email,"Booking Confirmation - White Lagoon", "<p>Your booking has been confirmed. Booking ID - " + bookingFromDb.Id+"</p>");
+                    _emailService.SendEmailAsync(bookingFromDb.Email, "Booking Confirmation - White Lagoon", "<p>Your booking has been confirmed. Booking ID - " + bookingFromDb.Id + "</p>");
                 }
             }
 
@@ -141,7 +138,7 @@ namespace WhiteLagoon.Web.Controllers
         {
             Booking bookingFromDb = _bookingService.GetBookingById(bookingId);
 
-            if (bookingFromDb.VillaNumber==0 && bookingFromDb.Status == SD.StatusApproved)
+            if (bookingFromDb.VillaNumber == 0 && bookingFromDb.Status == SD.StatusApproved)
             {
                 var availableVillaNumber = AssignAvailableVillaNumberByVilla(bookingFromDb.VillaId);
 
@@ -164,7 +161,7 @@ namespace WhiteLagoon.Web.Controllers
 
             // Load the template.
             string dataPath = basePath + @"/exports/BookingDetails.docx";
-            using FileStream fileStream = new (dataPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+            using FileStream fileStream = new(dataPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
             document.Open(fileStream, FormatType.Automatic);
 
             //Update Template
@@ -217,7 +214,7 @@ namespace WhiteLagoon.Web.Controllers
             WTableRow row0 = table.Rows[0];
 
             row0.Cells[0].AddParagraph().AppendText("NIGHTS");
-            row0.Cells[0].Width=80;
+            row0.Cells[0].Width = 80;
             row0.Cells[1].AddParagraph().AppendText("VILLA");
             row0.Cells[1].Width = 220;
             row0.Cells[2].AddParagraph().AppendText("PRICE PER NIGHT");
@@ -230,7 +227,7 @@ namespace WhiteLagoon.Web.Controllers
             row1.Cells[0].Width = 80;
             row1.Cells[1].AddParagraph().AppendText(bookingFromDb.Villa.Name);
             row1.Cells[1].Width = 220;
-            row1.Cells[2].AddParagraph().AppendText((bookingFromDb.TotalCost/bookingFromDb.Nights).ToString("c"));
+            row1.Cells[2].AddParagraph().AppendText((bookingFromDb.TotalCost / bookingFromDb.Nights).ToString("c"));
             row1.Cells[3].AddParagraph().AppendText(bookingFromDb.TotalCost.ToString("c"));
             row1.Cells[3].Width = 80;
 
@@ -265,11 +262,11 @@ namespace WhiteLagoon.Web.Controllers
             document.Replace("<ADDTABLEHERE>", bodyPart, false, false);
 
 
-            using DocIORenderer renderer = new ();
+            using DocIORenderer renderer = new();
             MemoryStream stream = new();
             if (downloadType == "word")
             {
-                
+
                 document.Save(stream, FormatType.Docx);
                 stream.Position = 0;
 
@@ -300,7 +297,7 @@ namespace WhiteLagoon.Web.Controllers
         [Authorize(Roles = SD.Role_Admin)]
         public IActionResult CheckOut(Booking booking)
         {
-            _bookingService.UpdateStatus(booking.Id, SD.StatusCompleted , booking.VillaNumber);
+            _bookingService.UpdateStatus(booking.Id, SD.StatusCompleted, booking.VillaNumber);
             TempData["Success"] = "Booking Completed Successfully.";
             return RedirectToAction(nameof(BookingDetails), new { bookingId = booking.Id });
         }
@@ -321,9 +318,9 @@ namespace WhiteLagoon.Web.Controllers
 
             var villaNumbers = _villaNumberService.GetAllVillaNumbers().Where(u => u.VillaId == villaId);
 
-            var checkedInVilla = _bookingService.GetCheckedInVillaNumbers(villaId);   
+            var checkedInVilla = _bookingService.GetCheckedInVillaNumbers(villaId);
 
-            foreach(var villaNumber in villaNumbers)
+            foreach (var villaNumber in villaNumbers)
             {
                 if (!checkedInVilla.Contains(villaNumber.Villa_Number))
                 {
@@ -353,7 +350,7 @@ namespace WhiteLagoon.Web.Controllers
             }
 
             objBookings = _bookingService.GetAllBookings(userId, status);
-                    
+
             return Json(new { data = objBookings });
         }
 

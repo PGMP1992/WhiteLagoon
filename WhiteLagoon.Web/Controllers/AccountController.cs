@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using WhiteLagoon.Application.Common.Interfaces;
 using WhiteLagoon.Application.Common.Utility;
 using WhiteLagoon.Domain.Entities;
 using WhiteLagoon.Web.ViewModels;
@@ -10,7 +9,7 @@ namespace WhiteLagoon.Web.Controllers
 {
     public class AccountController : Controller
     {
-        
+
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly RoleManager<IdentityRole> _roleManager;
@@ -25,12 +24,12 @@ namespace WhiteLagoon.Web.Controllers
             _signInManager = signInManager;
         }
 
-        public IActionResult Login(string returnUrl=null)
+        public IActionResult Login(string returnUrl = null)
         {
 
-            returnUrl??= Url.Content("~/");
+            returnUrl ??= Url.Content("~/");
 
-            LoginVM loginVM = new ()
+            LoginVM loginVM = new()
             {
                 RedirectUrl = returnUrl
             };
@@ -58,14 +57,14 @@ namespace WhiteLagoon.Web.Controllers
                 _roleManager.CreateAsync(new IdentityRole(SD.Role_Customer)).Wait();
             }
 
-            RegisterVM registerVM = new ()
+            RegisterVM registerVM = new()
             {
                 RoleList = _roleManager.Roles.Select(x => new SelectListItem
                 {
                     Text = x.Name,
                     Value = x.Name
                 }),
-                RedirectUrl = returnUrl 
+                RedirectUrl = returnUrl
             };
 
             return View(registerVM);
@@ -114,7 +113,7 @@ namespace WhiteLagoon.Web.Controllers
                 foreach (var error in result.Errors)
                 {
                     ModelState.AddModelError("", error.Description);
-                } 
+                }
             }
             registerVM.RoleList = _roleManager.Roles.Select(x => new SelectListItem
             {
@@ -131,7 +130,7 @@ namespace WhiteLagoon.Web.Controllers
             if (ModelState.IsValid)
             {
                 var result = await _signInManager
-                    .PasswordSignInAsync(loginVM.Email, loginVM.Password, loginVM.RememberMe, lockoutOnFailure:false);
+                    .PasswordSignInAsync(loginVM.Email, loginVM.Password, loginVM.RememberMe, lockoutOnFailure: false);
 
 
                 if (result.Succeeded)

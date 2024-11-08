@@ -1,7 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using Syncfusion.Presentation;
-using WhiteLagoon.Application.Common.Interfaces;
-using WhiteLagoon.Application.Common.Utility;
 using WhiteLagoon.Application.Services.Interface;
 using WhiteLagoon.Web.ViewModels;
 
@@ -24,24 +22,24 @@ namespace WhiteLagoon.Web.Controllers
             HomeVM homeVM = new()
             {
                 VillaList = _villaService.GetAllVillas(),
-                Nights=1,
-                CheckInDate =DateOnly.FromDateTime(DateTime.Now),
+                Nights = 1,
+                CheckInDate = DateOnly.FromDateTime(DateTime.Now),
             };
             return View(homeVM);
         }
 
         [HttpPost]
-        public IActionResult GetVillasByDate(int nights, DateOnly checkInDate) 
+        public IActionResult GetVillasByDate(int nights, DateOnly checkInDate)
         {
-           
+
             HomeVM homeVM = new()
             {
                 CheckInDate = checkInDate,
-                VillaList = _villaService.GetVillasAvailabilityByDate(nights,checkInDate),
+                VillaList = _villaService.GetVillasAvailabilityByDate(nights, checkInDate),
                 Nights = nights
             };
 
-            return PartialView("_VillaList",homeVM);
+            return PartialView("_VillaList", homeVM);
         }
 
         [HttpPost]
@@ -62,8 +60,8 @@ namespace WhiteLagoon.Web.Controllers
             ISlide slide = presentation.Slides[0];
 
 
-            IShape? shape = slide.Shapes.FirstOrDefault(u=>u.ShapeName== "txtVillaName") as IShape;
-            if(shape is not null)
+            IShape? shape = slide.Shapes.FirstOrDefault(u => u.ShapeName == "txtVillaName") as IShape;
+            if (shape is not null)
             {
                 shape.TextBody.Text = villa.Name;
             }
@@ -93,7 +91,7 @@ namespace WhiteLagoon.Web.Controllers
 
 
             shape = slide.Shapes.FirstOrDefault(u => u.ShapeName == "txtVillaAmenitiesHeading") as IShape;
-            if(shape is not null)
+            if (shape is not null)
             {
                 List<string> listItems = villa.VillaAmenity.Select(x => x.Name).ToList();
 
@@ -115,13 +113,13 @@ namespace WhiteLagoon.Web.Controllers
             }
 
             shape = slide.Shapes.FirstOrDefault(u => u.ShapeName == "imgVilla") as IShape;
-            if(shape is not null)
+            if (shape is not null)
             {
                 byte[] imageData;
                 string imageUrl;
                 try
                 {
-                    imageUrl= string.Format("{0}{1}", basePath, villa.ImageUrl);
+                    imageUrl = string.Format("{0}{1}", basePath, villa.ImageUrl);
                     imageData = System.IO.File.ReadAllBytes(imageUrl);
                 }
                 catch (Exception)
@@ -129,9 +127,9 @@ namespace WhiteLagoon.Web.Controllers
                     imageUrl = string.Format("{0}{1}", basePath, "/images/placeholder.png");
                     imageData = System.IO.File.ReadAllBytes(imageUrl);
                 }
-                slide.Shapes.Remove(shape); 
+                slide.Shapes.Remove(shape);
                 using MemoryStream imageStream = new(imageData);
-                IPicture newPicture = slide.Pictures.AddPicture(imageStream, 60,120,300,200);
+                IPicture newPicture = slide.Pictures.AddPicture(imageStream, 60, 120, 300, 200);
 
             }
 
@@ -140,7 +138,7 @@ namespace WhiteLagoon.Web.Controllers
             MemoryStream memoryStream = new();
             presentation.Save(memoryStream);
             memoryStream.Position = 0;
-            return File(memoryStream,"application/pptx","villa.pptx");
+            return File(memoryStream, "application/pptx", "villa.pptx");
 
 
         }

@@ -1,10 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using WhiteLagoon.Application.Common.Interfaces;
 using WhiteLagoon.Application.Services.Interface;
 using WhiteLagoon.Domain.Entities;
-using WhiteLagoon.Infrastructure.Data;
 using WhiteLagoon.Web.ViewModels;
 
 namespace WhiteLagoon.Web.Controllers
@@ -44,7 +41,7 @@ namespace WhiteLagoon.Web.Controllers
         {
             //ModelState.Remove("Villa");
 
-            bool roomNumberExists =  _villaNumberService.CheckVillaNumberExists(obj.VillaNumber.Villa_Number);
+            bool roomNumberExists = _villaNumberService.CheckVillaNumberExists(obj.VillaNumber.Villa_Number);
 
             if (ModelState.IsValid && !roomNumberExists)
             {

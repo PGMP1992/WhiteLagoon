@@ -1,9 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using WhiteLagoon.Application.Common.Interfaces;
 using WhiteLagoon.Application.Services.Interface;
 using WhiteLagoon.Domain.Entities;
-using WhiteLagoon.Infrastructure.Data;
 
 namespace WhiteLagoon.Web.Controllers
 {
@@ -62,7 +60,7 @@ namespace WhiteLagoon.Web.Controllers
             if (ModelState.IsValid && obj.Id > 0)
             {
 
-               _villaService.UpdateVilla(obj);
+                _villaService.UpdateVilla(obj);
                 TempData["success"] = "The villa has been updated successfully.";
                 return RedirectToAction(nameof(Index));
             }
@@ -83,7 +81,7 @@ namespace WhiteLagoon.Web.Controllers
         [HttpPost]
         public IActionResult Delete(Villa obj)
         {
-         bool deleted = _villaService.DeleteVilla(obj.Id);
+            bool deleted = _villaService.DeleteVilla(obj.Id);
             if (deleted)
             {
                 TempData["success"] = "The villa has been deleted successfully.";

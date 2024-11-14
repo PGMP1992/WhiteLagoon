@@ -363,3 +363,4 @@ MigrationBackup/
 FodyWeavers.xsd
 /WhiteLagoon.Web/wwwroot/images/VillaImage
 /WhiteLagoon.Web/appsettings.Development.json
+/WhiteLagoon.Web/appsettings.Production.json

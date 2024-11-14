@@ -24,6 +24,7 @@ namespace WhiteLagoon.Web.Controllers
         private readonly IVillaNumberService _villaNumberService;
         private readonly IPaymentService _paymentService;
         private readonly IEmailService _emailService;
+        
         public BookingController(IBookingService bookingService,
             IPaymentService paymentService,
             IVillaService villaService, IVillaNumberService villaNumberService,
@@ -38,6 +39,7 @@ namespace WhiteLagoon.Web.Controllers
             _bookingService = bookingService;
             _webHostEnvironment = webHostEnvironment;
         }
+
         [Authorize]
         public IActionResult Index()
         {
@@ -158,10 +160,10 @@ namespace WhiteLagoon.Web.Controllers
 
             WordDocument document = new WordDocument();
 
-
             // Load the template.
             string dataPath = basePath + @"/exports/BookingDetails.docx";
             using FileStream fileStream = new(dataPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+            
             document.Open(fileStream, FormatType.Automatic);
 
             //Update Template
@@ -261,12 +263,12 @@ namespace WhiteLagoon.Web.Controllers
 
             document.Replace("<ADDTABLEHERE>", bodyPart, false, false);
 
-
             using DocIORenderer renderer = new();
+            
             MemoryStream stream = new();
+            
             if (downloadType == "word")
             {
-
                 document.Save(stream, FormatType.Docx);
                 stream.Position = 0;
 
@@ -337,7 +339,9 @@ namespace WhiteLagoon.Web.Controllers
         public IActionResult GetAll(string status)
         {
             IEnumerable<Booking> objBookings;
+            
             string userId = "";
+            
             if (string.IsNullOrEmpty(status))
             {
                 status = "";
